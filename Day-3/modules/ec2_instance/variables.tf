@@ -1,11 +1,14 @@
 variable "ami_value" {
-    description = "value for the ami"
+    description = "ami id for the instance"
+    type        = string
 }
 
 variable "instance_type_value" {
-    description = "value for instance_type"
+    description = "ec2 instance_type"
+    type        = string
 }
 
 variable "subnet_id_value" {
-    description = "value for the subnet_id"
+    description = "subnet id"
+    type        = string
 }
