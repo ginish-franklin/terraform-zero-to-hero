@@ -13,7 +13,7 @@ variable "subnet_id_value" {
   type        = string
 }
 
-variable "ec2_name" {
+variable "ec2_name_value" {
   description = "Name tag for the ec2 instance"
   type        = string
 }
