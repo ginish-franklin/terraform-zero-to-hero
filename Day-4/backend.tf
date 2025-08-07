@@ -1,9 +1,8 @@
 terraform {
   backend "s3" {
-    bucket         = "abhishek-s3-demo-xyz" # change this
-    key            = "abhi/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-lock"
+    bucket = "terraform-day4-bucket-ginish"
+    region = "us-east-1"
+    key = "ginish/terraform.tfstate"
+    dynamodb_table = "terraform_lock"
   }
 }
