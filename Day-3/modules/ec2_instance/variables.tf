@@ -1,14 +1,19 @@
 variable "ami_value" {
-    description = "ami id for the instance"
-    type        = string
+  description = "AMI ID for the EC2 instance"
+  type        = string
 }
 
 variable "instance_type_value" {
-    description = "ec2 instance_type"
-    type        = string
+  description = "EC2 instance type"
+  type        = string
 }
 
 variable "subnet_id_value" {
-    description = "subnet id"
-    type        = string
+  description = "Subnet ID to launch the instance"
+  type        = string
+}
+
+variable "ec2_name" {
+  description = "Name tag for the ec2 instance"
+  type        = string
 }
