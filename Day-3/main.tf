@@ -14,3 +14,7 @@ module "ec2_instance" {
 output "ec2_public_ip" {
   value = module.ec2-instance.public-ip-address
 }
+
+output "ec2_instance_name" {
+  value = module.ec2-instance.instance_name
+}
