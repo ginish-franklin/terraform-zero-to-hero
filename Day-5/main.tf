@@ -1,15 +1,14 @@
-# Define the AWS provider configuration.
 provider "aws" {
-  region = "us-east-1"  # Replace with your desired AWS region.
+  region = "us-east-1"
 }
 
 variable "cidr" {
   default = "10.0.0.0/16"
 }
 
-resource "aws_key_pair" "example" {
-  key_name   = "terraform-demo-abhi"  # Replace with your desired key name
-  public_key = file("~/.ssh/id_rsa.pub")  # Replace with the path to your public key file
+resource "aws_key_pair" "terraformdemo" {
+  key_name   = "terraform-demo-ginishf"
+  public_key = file("~/.ssh/id_rsa.pub")
 }
 
 resource "aws_vpc" "myvpc" {
@@ -52,10 +51,19 @@ resource "aws_security_group" "webSg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
   ingress {
     description = "SSH"
     from_port   = 22
     to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "App Port"
+    from_port   = 8000
+    to_port     = 8000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -73,34 +81,42 @@ resource "aws_security_group" "webSg" {
 }
 
 resource "aws_instance" "server" {
-  ami                    = "ami-0261755bbcb8c4a84"
+  ami                    = "ami-020cba7c55df1f615" # Ubuntu 22.04
   instance_type          = "t2.micro"
-  key_name      = aws_key_pair.example.key_name
+  key_name               = aws_key_pair.terraformdemo.key_name
   vpc_security_group_ids = [aws_security_group.webSg.id]
   subnet_id              = aws_subnet.sub1.id
 
   connection {
     type        = "ssh"
-    user        = "ubuntu"  # Replace with the appropriate username for your EC2 instance
-    private_key = file("~/.ssh/id_rsa")  # Replace with the path to your private key
+    user        = "ubuntu"
+    private_key = file("~/.ssh/id_rsa")
     host        = self.public_ip
   }
 
-  # File provisioner to copy a file from local to the remote EC2 instance
   provisioner "file" {
-    source      = "app.py"  # Replace with the path to your local file
-    destination = "/home/ubuntu/app.py"  # Replace with the path on the remote instance
+    source      = "app.py"
+    destination = "/home/ubuntu/app.py"
   }
 
   provisioner "remote-exec" {
-    inline = [
-      "echo 'Hello from the remote instance'",
-      "sudo apt update -y",  # Update package lists (for ubuntu)
-      "sudo apt-get install -y python3-pip",  # Example package installation
-      "cd /home/ubuntu",
-      "sudo pip3 install flask",
-      "sudo python3 app.py &",
-    ]
+  inline = [
+    "echo 'Starting setup on EC2 instance...'",
+    "sudo apt update -y",
+    "sudo apt-get install -y python3-pip python3-venv",
+    "pip3 install flask --break-system-packages",
+    "chmod +x /home/ubuntu/app.py",
+    "nohup python3 /home/ubuntu/app.py > /home/ubuntu/flask.log 2>&1 &",
+    "sleep 5",
+    "curl -s http://localhost:8000 || echo 'App not responding' >> /home/ubuntu/flask.log"
+  ]
+}
+
+  tags = {
+    Name = "FlaskAppServer"
   }
 }
 
+output "instance_ip" {
+  value = aws_instance.server.public_ip
+}
