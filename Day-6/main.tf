@@ -3,13 +3,13 @@ provider "aws" {
 }
 
 variable "ami" {
-  description = "value"
+  description = "This is the value of the AMI"
 }
 
 variable "instance_type" {
-  description = "value"
+  description = "This is the value of the Instance Type"
   type = map(string)
-
+  
   default = {
     "dev" = "t2.micro"
     "stage" = "t2.medium"
